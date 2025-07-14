@@ -8,7 +8,7 @@ app = Flask(
     template_folder="templates",   # where form.html & persona.html will live
 )
 
-BACKEND_URL = "http://127.0.0.1:8000/generate-persona/"
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000") + "/generate-persona/"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -16,10 +16,10 @@ def index():
         reddit_url = request.form.get("reddit_url", "").strip()
         if not reddit_url:
             return render_template("form.html", error="Please enter a Reddit URL.")
-
         resp = requests.post(
             BACKEND_URL,
-            json={"reddit_url": reddit_url}
+            json={"reddit_url": reddit_url},
+            timeout=10
         )
         if resp.status_code != 200:
             return render_template(
