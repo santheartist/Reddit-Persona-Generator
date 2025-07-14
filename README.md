@@ -1,121 +1,144 @@
-# 💼 Resume Parser App (Flask + OpenAI + Bootstrap)
+# Reddit Persona Generator
 
-## 🧠 Objective  
-The Resume Parser App allows recruiters and job seekers to evaluate resumes using AI. Upload a PDF resume and specify a target profession (e.g., "Backend Developer") — the app will parse the resume and assess the candidate using OpenAI GPT-3.5.  
-It provides a detailed breakdown of:  
-- Contact information  
-- Work experience  
-- Skills (technical + soft)  
-- An AI-powered evaluation (score, recommendation, proceed/no decision)  
-> Built with Flask, OpenAI, Bootstrap 5, and modern UI/UX design.
+Generate a detailed UX-style persona from any public Reddit profile, complete with text summary, citations, and a dynamically generated avatar.
 
-## 📸 Sneak Peek  
-![App Screenshot](screenshots/1.png)  
-![App Screenshot](screenshots/2.png)
+---
 
-## 📸 Deployment  
-- Click on the following URL: **[App](https://resume-parser-tw8t.onrender.com)**
+## 🔧 Features
 
-## 🚀 Features  
-- Upload PDF resumes for analysis  
-- Specify a target profession for role-based evaluation  
-- AI-powered extraction of:  
-  - Full Name, Email, GitHub, LinkedIn  
-  - Employment History  
-  - Technical and Soft Skills  
-- Candidate Evaluation:  
-  - Score out of 10  
-  - Short recommendation  
-  - Proceed or not  
-- Light/Dark Mode Toggle with colorful 🌞 / 🌙 icons  
-- Clean, structured JSON-like output  
-- Responsive Bootstrap 5 UI with icons and transitions
+- **FastAPI backend** scrapes recent posts & comments via Selenium, uses OpenAI GPT-4 to infer persona details  
+- **Flask frontend** displays a clean Bootstrap-powered persona card  
+- **Custom avatar** generated on-the-fly by DALL·E 3 based on inferred traits  
+- **Export options**: print/PDF fallback or “Download” button to save the card as PNG  
 
-## ⚙️ Tech Stack  
-| Technology   | Use                           |
-|--------------|------------------------------|
-| Python 3.x    | Core backend logic           |
-| Flask        | Lightweight web framework    |
-| OpenAI GPT-3.5 | Resume parsing + evaluation |
-| PyPDF        | PDF text extraction          |
-| Bootstrap 5   | Responsive frontend styling |
-| YAML         | API key configuration        |
-| Jinja2       | HTML templating with Flask   |
+---
 
-## 📦 Installation & Setup  
-Clone the Repository:  
-    git clone https://github.com/your-username/resume-parser-ai.git  
-    cd resume-parser-ai  
+## 🚀 Getting Started
 
-Set Up Virtual Environment:  
-    python -m venv venv  
-    # For macOS/Linux  
-    source venv/bin/activate  
-    # For Windows  
-    venv\Scripts\activate  
+### 1. Clone the repo  
+~~~bash
+git clone https://github.com/your-username/reddit-persona-generator.git
+cd reddit-persona-generator
+~~~
 
-Install Dependencies:  
-    pip install -r requirements.txt  
+### 2. Create and populate your `.env` files  
 
-Add Your OpenAI API Key – create a file named **config.yaml** in the root directory with:  
-    OPENAI_API_KEY: "your-openai-api-key-here"  
+**backend/.env**
+~~~ini
+REDDIT_CLIENT_ID=your_reddit_client_id
+REDDIT_CLIENT_SECRET=your_reddit_client_secret
+REDDIT_USER_AGENT=your_user_agent
+OPENAI_API_KEY=sk-…
+~~~
 
-You can get your API key from <https://platform.openai.com/account/api-keys>
+**frontend/.env** (if needed)
+~~~ini
+BACKEND_URL=http://127.0.0.1:8000
+~~~
 
-Run the Flask App:  
-    python app.py  
+### 3. Install dependencies  
 
-Open in your browser:  
-Visit <http://localhost:8000>
+**Backend**
+~~~bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # macOS/Linux
+.venv\Scripts\activate           # Windows
+pip install -r requirements.txt
+~~~
 
-## 🧪 How It Works  
-1. Upload a PDF resume  
-2. Enter a target profession (e.g., “Data Scientist”)  
-3. AI extracts structured resume data  
-4. AI evaluates if the candidate fits the role  
-5. You receive:  
-   - Parsed fields with icons  
-   - Score out of 10  
-   - Recommendation  
-   - Proceed decision
+**Frontend**
+~~~bash
+cd ../frontend
+python -m venv .venv
+source .venv/bin/activate        # macOS/Linux
+.venv\Scripts\activate           # Windows
+pip install -r requirements.txt
+~~~
 
-## 📁 Project Structure  
-resume-parser-ai/
-├── app.py # Main Flask application
-├── resumeparser.py # OpenAI resume parsing & evaluation logic
-├── templates/
-│ └── index.html # Bootstrap UI template with light/dark theme
-├── static/
-│ └── logo.png # App logo
-├── screenshots/
-│ └── 1.png # Screenshot for README
-├── config.yaml # Your OpenAI API Key (you create this)
-├── requirements.txt # Required Python packages
-└── README.md # This file 📄
+### 4. Run locally  
 
+**Start the backend**
+~~~bash
+cd backend
+uvicorn app.main:app --reload
+~~~
 
-## 🙌 Contributing  
-Contributions are welcome! To contribute:  
-- Fork the project  
-- Create a new branch:  
-      git checkout -b feature/your-feature  
-- Commit your changes  
-- Open a Pull Request 🚀  
+**Start the frontend**
+~~~bash
+cd frontend
+python app.py
+~~~
 
-Ideas to improve:  
-- Add .docx resume support  
-- Add “Download as JSON” option  
-- Evaluate multiple roles  
-- Email feedback to the user
+Open your browser at **http://127.0.0.1:5000** (Flask) or **http://127.0.0.1:8501** (Streamlit), depending on which you use.
 
-## 📄 License  
-This project is licensed under the **MIT License**.  
-You are free to use, distribute, and modify this project for personal or commercial use.
+---
 
-## 🙏 Credits  
-- [OpenAI GPT-3.5](https://platform.openai.com/)  
-- [Bootstrap 5](https://getbootstrap.com/)  
-- [Flask](https://flask.palletsprojects.com/)  
-- [PyPDF](https://pypi.org/project/pypdf/)  
-- [Bootstrap Icons](https://icons.getbootstrap.com/)
+## 📂 Project Structure
+~~~text
+/
+├── backend/
+│   ├── app/
+│   │   ├── main.py
+│   │   ├── reddit_scraper.py
+│   │   ├── persona_generator.py
+│   │   ├── utils.py
+│   │   ├── models/reddit_user.py
+│   │   ├── templates/        # Jinja2 HTML for print/PDF fallback
+│   │   └── static/
+│   │       ├── img/          # default_avatar.png
+│   │       └── output/       # generated .txt and .png files
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── app.py                # Flask or Streamlit
+│   ├── templates/            # form.html & persona.html
+│   ├── static/img/           # default_avatar.png
+│   └── requirements.txt
+│
+├── .gitignore
+└── README.md
+~~~
 
+---
+
+## ⚙️ Environment Variables
+
+`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT` – for PRAW/Selenium  
+`OPENAI_API_KEY` – for GPT-4 and DALL·E image generation  
+`BACKEND_URL` (frontend) – points to your FastAPI server  
+
+---
+
+## 📦 Deployment
+
+Push to GitHub, then create two services on Render (or your host):
+
+| Service | Runtime | Start Command |
+|---------|---------|---------------|
+| **Backend** | Python 3 | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+| **Frontend** | Python 3 | `python app.py` |
+
+Add your `.env` variables in each service’s dashboard.
+
+---
+
+## 📝 Usage
+
+1. Enter a Reddit user URL (`https://reddit.com/user/username`).  
+2. Click **Generate Persona**.  
+3. View the text summary with citations, a styled persona card, and download or print as needed.  
+
+---
+
+## 🛠️ Troubleshooting
+
+- **Quota errors** → check your OpenAI billing dashboard.  
+- **Chromedriver issues** → ensure `webdriver-manager` can install or set `CHROME_PATH`.  
+- **Missing templates** → confirm `backend/app/templates` and `frontend/templates` exist.  
+
+---
+
+## ⚖️ License
+
+MIT © Sanchit Panda
