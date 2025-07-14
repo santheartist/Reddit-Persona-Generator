@@ -48,4 +48,9 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+
+    # Grab the PORT that Render sets, default back to 5000 locally
+    port = int(os.environ.get("PORT", 5000))
+    # Listen on all interfaces
+    app.run(host="0.0.0.0", port=port, debug=True)
