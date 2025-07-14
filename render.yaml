@@ -32,4 +32,3 @@ services:
     envVars:
       - key: BACKEND_URL        # set to your API’s Render URL, e.g. https://reddit-persona-api.onrender.com
 
-staticSites: []  # you’re not serving static-only sites here
