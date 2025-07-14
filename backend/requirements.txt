@@ -7,3 +7,6 @@ selenium>=4.0.0
 webdriver-manager
 beautifulsoup4
 pillow
+praw
+jinja2
+pyppeteer
