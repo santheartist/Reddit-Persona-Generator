@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"
+        integrity="sha512-/F9JGxufOGxhPSv4vlbpBokqOnR+nFIf0C1TvzlQvw8/locPxEwOPCYVZaEH4UHDf9lOEg+ACGlGVAi8rGRinw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="utf-8">
+    <title>Persona Card</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS v5.3 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
+    <style media="print">
+      /* hide everything… */
+      body * {
+        visibility: hidden !important;
+      }
+      /* …except the card container and its children */
+      #card-container,
+      #card-container * {
+        visibility: visible !important;
+      }
+      /* position the card at the top-left of the page */
+      #card-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+      }
+    </style>
+    <style>
+      body, html { margin:0; padding:0; background:#f8f9fa; }
+      #card-container {
+        max-width:1024px; margin:1rem auto;
+        background:#fff; box-shadow:0 0 16px rgba(0,0,0,0.2);
+        font-family:Arial,sans-serif;
+      }
+      .left-col {
+        border-right:1px solid #ddd; padding:1rem;
+      }
+      .left-col img {
+        width:100%; max-width:416px; height:auto;
+        border-radius:8px; border:3px solid #e67e22;
+        display:block; margin:0 auto;
+      }
+      .left-col h2 {
+        margin-top:1rem; font-size:2rem; color:#e67e22;
+        text-align:center;
+      }
+
+      /* ←— THIS IS YOUR INFO BOX */
+      .info-table {
+        width:100%; margin-top:1rem; font-size:0.9rem;
+        background:#fafafa; border:1px solid #ccc;
+        border-radius:4px; padding:0.5rem;
+      }
+      .info-table th,
+      .info-table td {
+        padding:0.25rem 0.5rem;
+      }
+
+      .traits {
+        display:grid; grid-template-columns:1fr 1fr;
+        gap:0.5rem; margin-top:1rem;
+      }
+      .trait {
+        background:#f0f0f0; text-align:center;
+        padding:0.5rem 0; border-radius:4px;
+        font-size:0.85rem;
+      }
+
+      .right-col { padding:2rem; position: relative; }
+      .section { margin-bottom:2rem; }
+      .section h3 {
+        font-size:1.75rem; color:#e67e22;
+        border-bottom:1px solid #ccc;
+        padding-bottom:0.25rem; margin-bottom:0.75rem;
+      }
+      .section ul {
+        list-style:disc inside; margin:0; padding-left:1rem;
+      }
+      .section ul li { margin-bottom:0.5rem; }
+    </style>
+  </head>
+
+  <body>
+    <div id="card-container" class="container-fluid p-0">
+      <div class="row g-0">
+        <!-- LEFT COLUMN (33%) -->
+        <div class="col-md-4 left-col">
+          <img src="{{ avatar_url }}" alt="Avatar" class="img-fluid rounded"/>
+          <h2>{{ fields.name }}</h2>
+
+          <table class="info-table table table-borderless">
+            <tr><th>Age:</th>        <td>{{ fields.age }}</td></tr>
+            <tr><th>Occupation:</th> <td>{{ fields.occupation }}</td></tr>
+            <tr><th>Status:</th>     <td>{{ fields.status }}</td></tr>
+            <tr><th>Location:</th>   <td>{{ fields.location }}</td></tr>
+            <tr><th>Tier:</th>       <td>{{ fields.tier }}</td></tr>
+            <tr><th>Archetype:</th>  <td>{{ fields.archetype }}</td></tr>
+          </table>
+
+          <div class="traits">
+            {% for t in fields.traits %}
+              <div class="trait">{{ t }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN (66%) -->
+        <div class="col-md-8 right-col">
+          <div class="section">
+            <h3>BEHAVIOUR &amp; HABITS</h3>
+            <ul>
+              {% for b in fields.behaviours %}
+                <li>{{ b }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="section">
+            <h3>MOTIVATIONS</h3>
+            <ul>
+              {% for m in fields.motivations %}
+                <li>{{ m }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="section">
+            <h3>FRUSTRATIONS</h3>
+            <ul>
+              {% for f in fields.frustrations %}
+                <li>{{ f }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="section mb-0">
+            <h3>GOALS &amp; NEEDS</h3>
+            <ul>
+              {% for g in fields.goals %}
+                <li>{{ g }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h3>CITATIONS</h3>
+      <ul>
+        {% for c in fields.citations %}
+          <li><a href="{{ c }}" target="_blank">{{ c }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <!-- fixed button group at bottom-right of screen -->
+    <div class="position-fixed d-flex justify-content-end" style="bottom:1rem; right:1rem; z-index:1050;">
+      <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+        Back
+      </a>
+      <button id="print-btn" class="btn btn-secondary me-2">
+        Download
+      </button>
+    </div>
+    <script>
+      document.getElementById('print-btn').addEventListener('click', () => {
+      window.print();
+      });
+    </script>
+  </body>
+</html>
