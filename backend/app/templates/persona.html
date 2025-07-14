@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Bootstrap 5 CDN -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Reddit Persona Generator</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    integrity="sha384-..."
+    crossorigin="anonymous">
+  <style>
+    body { background:#111; color:#fff; font-family:Arial, sans-serif; }
+    .card-wrapper { max-width:1024px; margin:2rem auto; }
+    .section-title { color:#E67E22; margin-top:2rem; }
+    .divider { border-top:1px solid #444; margin:0.5rem 0 1rem; }
+    .bar-track { background:#333; border-radius:4px; overflow:hidden; height:10px; }
+    .bar-fill  { background:#E67E22; height:100%; }
+    .info-table td { padding:4px 8px; }
+    .traits .badge { background:#333; margin:4px; }
+  </style>
+</head>
+<body>
+  <div class="container card-wrapper">
+    <h1 class="mb-4">🔍 Reddit Persona Generator</h1>
+    <form method="POST" class="input-group mb-5">
+      <input name="reddit_url" class="form-control" placeholder="Enter reddit.com/user/…" required>
+      <button class="btn btn-outline-light">Generate Persona</button>
+    </form>
+
+    {% if f %}
+    <div class="row g-4"> 
+      <!-- LEFT COLUMN -->
+      <div class="col-md-5">
+        <img src="{{ url_for('static',filename='avatar.png') }}"
+             class="img-fluid rounded mb-3" style="width:416px; height:416px; object-fit:cover;">
+        <h2 class="text-warning">{{ f.name }}</h2>
+        <hr class="divider">
+
+        <table class="info-table text-light">
+          <tr><td><strong>Age:</strong></td><td>{{ f.age }}</td></tr>
+          <tr><td><strong>Occupation:</strong></td><td>{{ f.occupation }}</td></tr>
+          <tr><td><strong>Status:</strong></td><td>{{ f.status }}</td></tr>
+          <tr><td><strong>Location:</strong></td><td>{{ f.location }}</td></tr>
+          <tr><td><strong>Tier:</strong></td><td>{{ f.tier }}</td></tr>
+          <tr><td><strong>Archetype:</strong></td><td>{{ f.archetype }}</td></tr>
+        </table>
+
+        <hr class="divider">
+        <div class="traits">
+          {% for t in f.traits %}
+            <span class="badge text-light">{{ t }}</span>
+          {% endfor %}
+        </div>
+
+        <hr class="divider">
+        <h4 class="text-warning">Motivations</h4>
+        {% for m in f.motivations_bars %}
+        <div class="mb-2">
+          <small>{{ m.label }}</small>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:{{ m.value }}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+
+        <h4 class="text-warning mt-4">Personality</h4>
+        {% for p in f.personality_bars %}
+        <div class="mb-2">
+          <small>{{ p.label }}</small>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:{{ p.value }}%"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col-md-7 text-start">
+        <h3 class="section-title">BEHAVIOUR & HABITS</h3><hr class="divider">
+        <ul>
+          {% for b in f.behaviours %}<li>{{ b }}</li>{% endfor %}
+        </ul>
+
+        <h3 class="section-title">FRUSTRATIONS</h3><hr class="divider">
+        <ul>
+          {% for x in f.frustrations %}<li>{{ x }}</li>{% endfor %}
+        </ul>
+
+        <h3 class="section-title">GOALS & NEEDS</h3><hr class="divider">
+        <ul>
+          {% for g in f.goals %}<li>{{ g }}</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <h5>🔗 Citations</h5>
+    <ul class="text-light">
+      {% for c in citations %}<li>{{ c }}</li>{% endfor %}
+    </ul>
+    <h5>📝 Full Persona Text</h5>
+    <pre class="bg-dark p-3 text-light">{{ persona }}</pre>
+    {% endif %}
+  </div>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-..."
+    crossorigin="anonymous">
+  </script>
+</body>
+</html>
