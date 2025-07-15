@@ -13,7 +13,7 @@ async def _get_page_content(url: str) -> str:
             "--disable-dev-shm-usage",
             "--disable-gpu",
             "--window-size=1280,1024",
-        ]
+        ],
     )
     page = await browser.newPage()
     await page.goto(url, {"waitUntil": "networkidle2"})
@@ -23,16 +23,21 @@ async def _get_page_content(url: str) -> str:
 
 def fetch_user_data(reddit_url: str) -> dict:
     """
-    Uses Pyppeteer to load the Reddit profile page (so dynamic JS content is rendered),
-    then falls back to BeautifulSoup to extract up to 5 posts & 5 comments.
+    Uses a fresh asyncio event loop to drive Pyppeteer, then
+    falls back to BeautifulSoup for scraping the rendered HTML.
     """
-    html = asyncio.get_event_loop().run_until_complete(_get_page_content(reddit_url))
+    # 1) Spin up a brand-new event loop for Pyppeteer
+    loop = asyncio.new_event_loop()
+    try:
+        html = loop.run_until_complete(_get_page_content(reddit_url))
+    finally:
+        loop.close()
+
+    # 2) Parse with BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
-
     username = reddit_url.rstrip("/").split("/")[-1]
-    posts, comments = [], []
 
-    # up to 5 latest submissions
+    posts, comments = [], []
     for post in soup.select("div.Post")[:5]:
         title_el   = post.select_one("h3")
         content_el = post.select_one("p")
@@ -43,7 +48,6 @@ def fetch_user_data(reddit_url: str) -> dict:
             "content":   content_el.text if content_el else ""
         })
 
-    # up to 5 latest comments
     for comment in soup.select("div.Comment")[:5]:
         sr_el   = comment.select_one("a[data-click-id=subreddit]")
         body_el = comment.select_one("div[data-test-id=comment]")
