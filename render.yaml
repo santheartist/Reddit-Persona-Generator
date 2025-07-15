@@ -10,15 +10,6 @@ services:
     startCommand: |
       cd backend
       uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: REDDIT_CLIENT_ID
-        fromSecret: REDDIT_CLIENT_ID
-      - key: REDDIT_CLIENT_SECRET
-        fromSecret: REDDIT_CLIENT_SECRET
-      - key: REDDIT_USER_AGENT
-        fromSecret: REDDIT_USER_AGENT
-      - key: OPENAI_API_KEY
-        fromSecret: OPENAI_API_KEY
 
   - type: web
     name: reddit-persona-ui
@@ -31,6 +22,3 @@ services:
     startCommand: |
       cd frontend
       python app.py
-    envVars:
-      - key: BACKEND_URL
-        fromService: reddit-persona-api
