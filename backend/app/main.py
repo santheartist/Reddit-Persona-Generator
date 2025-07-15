@@ -26,7 +26,7 @@ def save_persona_text(username: str, persona_md: str) -> str:
 async def gen_persona(req: RedditProfileRequest):
     try:
         # 1) Scrape & GPT → markdown, citations, fields
-        user_data       = await fetch_user_data(req.reddit_url)
+        user_data       = fetch_user_data(req.reddit_url)
         persona_md, citations, fields = generate_persona(user_data)
 
         # 2) Save markdown
