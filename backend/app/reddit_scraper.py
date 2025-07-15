@@ -23,17 +23,21 @@ async def _get_page_content(url: str) -> str:
 
 def fetch_user_data(reddit_url: str) -> dict:
     """
-    Uses a fresh asyncio event loop to drive Pyppeteer, then
-    falls back to BeautifulSoup for scraping the rendered HTML.
+    Uses an isolated asyncio loop for Pyppeteer, then
+    parses the rendered HTML with BeautifulSoup.
     """
-    # 1) Spin up a brand-new event loop for Pyppeteer
+    # 1) Create and set a fresh event loop
     loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     try:
         html = loop.run_until_complete(_get_page_content(reddit_url))
     finally:
+        # 2) Always close the loop to avoid warnings
         loop.close()
+        asyncio.set_event_loop(None)
 
-    # 2) Parse with BeautifulSoup
+    # 3) Parse the HTML
     soup = BeautifulSoup(html, "html.parser")
     username = reddit_url.rstrip("/").split("/")[-1]
 
