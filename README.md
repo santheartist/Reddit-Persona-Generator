@@ -13,6 +13,13 @@ Generate a detailed UX-style persona from any public Reddit profile, complete wi
 
 ---
 
+## 📸 Sneak Peek  
+![App Screenshot](screenshot/1.png)
+![App Screenshot](screenshot/2.png)
+![App Screenshot](screenshot/3.png)
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Clone the repo  
