@@ -1,67 +1,56 @@
-# backend/app/reddit_scraper.py
+# reddit_scraper.py
 
-import asyncio
-from pyppeteer import launch
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-
-async def _get_page_content(url: str) -> str:
-    browser = await launch(
-        headless=True,
-        args=[
-            "--no-sandbox",
-            "--disable-setuid-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-gpu",
-            "--window-size=1280,1024",
-        ],
-    )
-    page = await browser.newPage()
-    await page.goto(url, {"waitUntil": "networkidle2"})
-    content = await page.content()
-    await browser.close()
-    return content
+import time
 
 def fetch_user_data(reddit_url: str) -> dict:
-    """
-    Uses an isolated asyncio loop for Pyppeteer, then
-    parses the rendered HTML with BeautifulSoup.
-    """
-    # 1) Create and set a fresh event loop
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+    # 1) configure your ChromeOptions as before
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    # any other options…
+
+    # 2) wrap the driver binary in a Service
+    service = Service(ChromeDriverManager().install())
+
+    # 3) pass service=… instead of executable_path
+    driver = webdriver.Chrome(service=service, options=options)
 
     try:
-        html = loop.run_until_complete(_get_page_content(reddit_url))
+        driver.get(reddit_url)
+        time.sleep(2)  # give the JS some time to load
+
+        html = driver.page_source
+        soup = BeautifulSoup(html, "html.parser")
+
+        # … your existing logic to extract posts/comments …
+        username = reddit_url.rstrip("/").split("/")[-1]
+        posts = []
+        for post in soup.select("div.Post"):
+            title = post.select_one("h3")
+            content = post.select_one("p")
+            posts.append({
+                "subreddit": post.select_one("a[data-click-id=subreddit]").text,
+                "title":    title.text if title else "",
+                "content":  content.text if content else ""
+            })
+
+        comments = []
+        for comment in soup.select("div.Comment"):
+            subreddit = comment.select_one("a[data-click-id=subreddit]")
+            body      = comment.select_one("div[data-test-id=comment]")
+            comments.append({
+                "subreddit": subreddit.text if subreddit else "",
+                "content":   body.text if body else ""
+            })
+
+        return {
+            "username": username,
+            "posts":    posts,
+            "comments": comments,
+        }
+
     finally:
-        # 2) Always close the loop to avoid warnings
-        loop.close()
-        asyncio.set_event_loop(None)
-
-    # 3) Parse the HTML
-    soup = BeautifulSoup(html, "html.parser")
-    username = reddit_url.rstrip("/").split("/")[-1]
-
-    posts, comments = [], []
-    for post in soup.select("div.Post")[:5]:
-        title_el   = post.select_one("h3")
-        content_el = post.select_one("p")
-        sr_el      = post.select_one("a[data-click-id=subreddit]")
-        posts.append({
-            "subreddit": sr_el.text if sr_el else "",
-            "title":     title_el.text if title_el else "",
-            "content":   content_el.text if content_el else ""
-        })
-
-    for comment in soup.select("div.Comment")[:5]:
-        sr_el   = comment.select_one("a[data-click-id=subreddit]")
-        body_el = comment.select_one("div[data-test-id=comment]")
-        comments.append({
-            "subreddit": sr_el.text if sr_el else "",
-            "content":   body_el.text if body_el else ""
-        })
-
-    return {
-        "username": username,
-        "posts":    posts,
-        "comments": comments,
-    }
+        driver.quit()
