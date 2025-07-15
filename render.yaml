@@ -1,24 +1,35 @@
+# render.yaml
 services:
+  # ──────────────── Backend ────────────────
   - type: web
     name: reddit-persona-api
     env: python
     region: oregon
     branch: main
-    buildCommand: |
-      cd backend
-      pip install -r requirements.txt
-    startCommand: |
-      cd backend
-      uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      # these must be set in your Render dashboard under "Environment" → "Secrets"
+      - key: REDDIT_CLIENT_ID
+        fromSecret: REDDIT_CLIENT_ID
+      - key: REDDIT_CLIENT_SECRET
+        fromSecret: REDDIT_CLIENT_SECRET
+      - key: REDDIT_USER_AGENT
+        fromSecret: REDDIT_USER_AGENT
+      - key: OPENAI_API_KEY
+        fromSecret: OPENAI_API_KEY
 
+  # ──────────────── Frontend ────────────────
   - type: web
     name: reddit-persona-ui
     env: python
     region: oregon
     branch: main
-    buildCommand: |
-      cd frontend
-      pip install -r requirements.txt
-    startCommand: |
-      cd frontend
-      python app.py
+    dir: frontend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      # this will automatically be set to the backend's live URL once it's up
+      - key: BACKEND_URL
+        fromService: reddit-persona-api
