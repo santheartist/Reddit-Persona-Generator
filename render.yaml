@@ -6,7 +6,7 @@ services:
     env: python
     region: oregon
     branch: main
-    dir: backend
+    path: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
@@ -26,7 +26,7 @@ services:
     env: python
     region: oregon
     branch: main
-    dir: frontend
+    path: frontend
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
     envVars:
